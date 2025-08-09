@@ -27,6 +27,7 @@ import {
   transformStatesLabelsData,
   transformUserLocation,
 } from "./utils/geoUtils";
+import { extrudedBuildingsLayer } from "./layers/polygon";
 import ScaleBar from "./components/scalebar";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -88,8 +89,9 @@ export default function MapView() {
     if (map || !mapContainerRef.current) return;
     const mapInstance = new maplibregl.Map({
       container: mapContainerRef.current,
-      center: [0, 0],
-      zoom: 1.2,
+      center: [114.164607345042695, 22.322817387691138],
+      zoom: 15.7,
+      pitch: 35,
       minZoom: 0,
       style: {
         version: 8,
@@ -165,6 +167,10 @@ export default function MapView() {
     mapInstance.once("load", () => {
       initializeMapSourcesAndLayers(mapInstance);
       mapInstance.addImage("pulsing-dot", pulsingDot, { pixelRatio: 2 });
+
+      if (!mapInstance.getLayer(extrudedBuildingsLayer.layer.id)) {
+        mapInstance.addLayer(extrudedBuildingsLayer.layer);
+      }
 
       const baseCoastlineLayer = mapInstance.getLayer("baseCoastlineLayer");
       const baseCountriesLayer = mapInstance.getLayer("baseCountriesLayer");
