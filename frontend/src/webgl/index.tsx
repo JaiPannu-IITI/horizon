@@ -91,7 +91,7 @@ export default function MapView() {
     const mapInstance = new maplibregl.Map({
       container: mapContainerRef.current,
       center: [114.164607345042695, 22.322817387691138],
-      zoom: 15.7,
+      zoom: 16.8,
       pitch: 35,
       minZoom: 0,
       style: {
