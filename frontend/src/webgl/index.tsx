@@ -174,6 +174,13 @@ export default function MapView() {
 
       const baseCoastlineLayer = mapInstance.getLayer("baseCoastlineLayer");
       const baseCountriesLayer = mapInstance.getLayer("baseCountriesLayer");
+      const baseStatesLayer = mapInstance.getLayer("baseStatesLayer");
+      const polygonsLayer = mapInstance.getLayer("basePolygonsLayer");
+      const naturalPolygonsLayer = mapInstance.getLayer("naturalPolygonsLayer");
+      const roadLayer = mapInstance.getLayer("roadLayer");
+
+      const zoom = mapInstance.getZoom();
+      const center = mapInstance.getCenter();
 
       if (baseCoastlineLayer) {
         fetchCoastlines().catch((err: any) =>
@@ -190,6 +197,67 @@ export default function MapView() {
       } else {
         console.log("baseCountriesLayer is hidden");
       }
+
+       // Check if we've moved to a completely new area (not just zoomed in)
+       if (lastCenterRef.current) {
+        const lastCenter = lastCenterRef.current;
+        // If we've moved more than 0.5 degrees in any direction, consider it a new area
+        const hasMovedSignificantly =
+          Math.abs(center.lng - lastCenter.lng) > 0.5 ||
+          Math.abs(center.lat - lastCenter.lat) > 0.5;
+
+        if (hasMovedSignificantly) {
+          resetBoundingBoxes();
+        }
+      }
+
+      // Update the last center reference
+      lastCenterRef.current = { lng: center.lng, lat: center.lat };
+
+      if (baseStatesLayer && !baseStatesLoading) {
+        updateBaseStates(mapInstance, fetchStates, zoom);
+        console.log("baseStatesLayer is visible");
+      } else {
+        console.log("baseStatesLayer is hidden");
+      }
+
+      if (
+        naturalPolygonsLayer &&
+        naturalPolygonsLayer.minzoom <= zoom &&
+        zoom <= naturalPolygonsLayer.maxzoom &&
+        !naturalPolygonsLoading
+      ) {
+        updateNaturalPolygons(mapInstance, fetchNaturalPolygons, 250);
+        console.log("naturalPolygonsLayer is visible");
+      } else {
+        console.log("naturalPolygonsLayer is hidden");
+      }
+
+      if (
+        polygonsLayer &&
+        polygonsLayer.minzoom <= zoom &&
+        zoom <= polygonsLayer.maxzoom &&
+        !polygonsLoading
+      ) {
+        updatePolygons(mapInstance, fetchPolygons, 3000);
+        console.log("polygonsLayer is visible");
+      } else {
+        console.log("polygonsLayer is hidden");
+      }
+
+      if (
+        roadLayer &&
+        roadLayer.minzoom <= zoom &&
+        zoom <= roadLayer.maxzoom &&
+        !roadsLoading
+      ) {
+        updateRoads(mapInstance, fetchRoads, zoom);
+        console.log("roadLayer is visible");
+      } else {
+        console.log("roadLayer is hidden");
+      }
+
+      
     });
 
     mapInstance.on("moveend", () => {
