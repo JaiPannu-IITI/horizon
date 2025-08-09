@@ -311,6 +311,7 @@ const OfflineAreaDownloader: React.FC<OfflineAreaDownloaderProps> = ({
       setStartCoord(null);
       setEndCoord(null);
       removeRectangleOverlay();
+      window.location.reload();
     } catch (err) {
       console.error("Error fetching/storing offline data:", err);
       toast.dismiss();
